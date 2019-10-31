@@ -1,13 +1,13 @@
-#PANDAGANTT python PRINCE2 plan generator
-#Charles Fox, University of Lincoln, 2019
+#PANDAGANTT python3 PRINCE2 plan generator
+#(c) Charles Fox, University of Lincoln, 2019
+#Distributed under GNU General Public License (GPL) v3 see https://www.gnu.org/licenses/gpl-3.0.en.html
+#("pandgantt" is pronounced in a New Zealand accent similar to "pendagent")
+#eg. usgae:  python3 pandagantt.py ~/Dropbox/ARWAC/admin/pandagantt/in/   ~/Dropbox/ARWAC/admin/pandagantt/out/
 
 import pandas as pd
 import numpy as np
-import subprocess, pdb
-import datetime
+import sys, subprocess, pdb, glob, datetime
 from dateutil.relativedelta import *
-
-
 
 import GanttChart
 
@@ -15,8 +15,8 @@ pd.set_option('display.max_columns', 20)
 
 ############LATEX FUNTIONS##########
 
-def latexHeader():
-    docTitle = "ARWAC second stage plan"
+def latexHeader(projectID, authors, dir_in):
+    docTitle = projectID+" second stage plan"
     dateStr = ""+datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
     s='\\documentclass[english]{article}\n'
     s+='\\usepackage[T1]{fontenc}\n'
@@ -24,11 +24,11 @@ def latexHeader():
     s+='\\usepackage{babel}\n'
     s+='\\usepackage{graphicx}\n'
     s+='\\begin{document}\n'
-    s+="\\title{"+docTitle+"}\\author{ARWAC Consortium}\\date{"+dateStr+"}\\maketitle\n"
+    s+="\\title{"+docTitle+"}\\author{%s}\\date{"%authors+dateStr+"}\\maketitle\n"
     s+="\\begin{center}\n\n"
-    s+= "\\includegraphics[width=6cm]{arwac.png}\n\n"
-    s+= "\\includegraphics[width=6cm]{lincoln.jpeg}\n\n"
-    s+= "\\includegraphics[width=6cm]{innovateuk.png}\n\n"
+    s+= "\\includegraphics[width=6cm]{"+dir_in+"logo1.png}\n\n"
+    s+= "\\includegraphics[width=6cm]{"+dir_in+"logo2.png}\n\n"
+    s+= "\\includegraphics[width=6cm]{"+dir_in+"logo3.png}\n\n"
     s+="\\end{center}\n\n"
     s+= "\\newpage\n\n"
     s+= getIntroText()
@@ -245,8 +245,6 @@ def getRiskMatrix():
 
         s+= "Owner: %s\n\n"%row['RiskOwner']
 
-
-
         #get list of associated deliverables
         s += "Associated deliverables: "
         df = rd[rd['RiskID']==row['RiskID']]
@@ -256,9 +254,23 @@ def getRiskMatrix():
 
     return s
 
-def makeStageTwoPlan(fn_out, df_deliverable):
-    f_out = open(fn_out, 'w')
-    s = latexHeader()
+def runLatex(projectID, dir_out):
+    #this is needed to get the command line paths in the right place to run latex
+    fn_shellScript = dir_out+"runpdflatex.sh"
+    f_shellScript=open(fn_shellScript, "w")
+    f_shellScript.write("cd "+dir_out+"\n")
+    f_shellScript.write("pdflatex "+dir_out+projectID+"_stage2plan.tex\n")
+    f_shellScript.close()
+    cmd = "chmod +x "+dir_out+"/runpdflatex.sh"
+    subprocess.call(cmd, shell="True")
+    cmd = dir_out+"/runpdflatex.sh"
+    subprocess.call(cmd, shell="True")
+
+
+def makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors):
+    fn_tex = dir_out+"%s_stage2plan.tex"%projectID
+    f_out = open(fn_tex, 'w')
+    s = latexHeader(projectID, authors, dir_in)
     s+="\\newpage\n\n"
     s+="\\section{Deliverables}\n\n"
     #get list of deliverables and text for each one
@@ -272,9 +284,8 @@ def makeStageTwoPlan(fn_out, df_deliverable):
 
     s += latexFooter()
     f_out.write(s)
-    cmd = "./runpdflatex.sh"
-    subprocess.call(cmd, shell="True")
 
+    fn_shell_long = runLatex(projectID, dir_out)
 
 
 def makeGanttChart(fn_gantt_png, date_project_start):
@@ -289,27 +300,42 @@ def makeGanttChart(fn_gantt_png, date_project_start):
     g.draw(fn_gantt_png)
 
 
-dir_csv = "csv/ARWAC_costs_sheets - "
-dir_out = "out/"
-df_cost = pd.read_csv(dir_csv+'Cost.csv', skiprows=0, header=0) 
-df_deliverable = pd.read_csv(dir_csv+'Deliverable.csv', skiprows=0, header=0) 
-df_desc = pd.read_csv(dir_csv+'DeliverableText.csv', skiprows=0, header=0) 
-df_risk = pd.read_csv(dir_csv+'Risk.csv', skiprows=0, header=0) 
-df_RiskDeliverable = pd.read_csv(dir_csv+'RiskDeliverable.csv', skiprows=0, header=0) 
-df_Dependency = pd.read_csv(dir_csv+'Dependency.csv', skiprows=0, header=0) 
-df_Project = pd.read_csv(dir_csv+'Project.csv', skiprows=0, header=0) 
-df_WorkPackage = pd.read_csv(dir_csv+'WorkPackage.csv', skiprows=0, header=0) 
+def getProjectID(dir_in):
+    fns = glob.glob(dir_in+"* - Project.csv")
+    fn_project_long = fns[0]
+    fn_project_short=fn_project_long.split("/")[-1]
+    projectID=fn_project_short.split("_")[0]
+    return projectID
 
-gb = df_cost.merge(df_deliverable)[['Partner', 'Quarter', 'Category', 'Cost']].groupby(['Partner','Quarter', 'Category'])
+if __name__ == "__main__":
+    if len(sys.argv) < 3:
+        #testing
+        dir_in = "/home/charles/Dropbox/ARWAC/admin/pandagantt/in/"
+        dir_out = "/home/charles/Dropbox/ARWAC/admin/pandagantt/out/"
+#        print("USAGE: pandagantt inputdir outputdir")
+#        sys.exit(0)
+    else:
+        dir_in = sys.argv[1]+"/"
+        dir_out = sys.argv[2]+"/"
+    projectID = getProjectID(dir_in)
+    dir_csv = dir_in + "/%s_pandagantt - "%projectID
+    df_cost = pd.read_csv(dir_csv+'Cost.csv', skiprows=0, header=0) 
+    df_deliverable = pd.read_csv(dir_csv+'Deliverable.csv', skiprows=0, header=0) 
+    df_desc = pd.read_csv(dir_csv+'DeliverableText.csv', skiprows=0, header=0) 
+    df_risk = pd.read_csv(dir_csv+'Risk.csv', skiprows=0, header=0) 
+    df_RiskDeliverable = pd.read_csv(dir_csv+'RiskDeliverable.csv', skiprows=0, header=0) 
+    df_Dependency = pd.read_csv(dir_csv+'Dependency.csv', skiprows=0, header=0) 
+    df_Project = pd.read_csv(dir_csv+'Project.csv', skiprows=0, header=0) 
+    df_WorkPackage = pd.read_csv(dir_csv+'WorkPackage.csv', skiprows=0, header=0) 
+
+    gb = df_cost.merge(df_deliverable)[['Partner', 'Quarter', 'Category', 'Cost']].groupby(['Partner','Quarter', 'Category'])
+
+    rd = df_RiskDeliverable.merge(df_risk)
+
+    date_project_start = datetime.datetime.strptime(df_Project.iloc[0]['StartDate'], "%Y-%m-%d" )
+    authors = df_Project.iloc[0]['ReportAuthor']
 
 
-rd = df_RiskDeliverable.merge(df_risk)
-#rd = df_RiskDeliverable.merge(df_risk).merge(df_deliverable)  #testing risk-deliverable join
+    makeGanttChart(dir_out+"gantt.png", date_project_start)
 
-
-date_project_start = datetime.datetime.strptime('2019-04-01_00:09:00.00', "%Y-%m-%d_%H:%M:%S.%f" )
-
-
-makeGanttChart(dir_out+"gantt.png", date_project_start)
-fn_tex = dir_out+"ARWAC_stage2plan.tex"
-makeStageTwoPlan(fn_tex, df_deliverable)
+    makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors)
