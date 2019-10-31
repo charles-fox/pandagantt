@@ -1,3 +1,7 @@
+#(c) Charles Fox, University of Lincoln, 2019
+#Distributed under GNU General Public License (GPL) v3 see https://www.gnu.org/licenses/gpl-3.0.en.html
+
+
 import math,cairo
 import datetime
 
@@ -30,7 +34,7 @@ class GanttChart:
         return int( 0.0 + self.height*r/38.    )  #CHANGE YSCALE HERE*****
 
 
-    def drawTask(self, i_row_in, t_start, t_end, name):
+    def drawTask(self, i_row_in, t_start, t_end, name, status="WAITING"):
         i_row=i_row_in+1  #HACK move everythign down 1 line to make space at top
         ctx=self.ctx
         xstart=self.t2x(t_start)
@@ -40,7 +44,15 @@ class GanttChart:
         w=xend-xstart
         h=yend-ystart
 
-        ctx.set_source_rgb(.5,.5,1)
+        dct_colors = dict()
+        dct_colors["WAITING"] = [.5, .5, 1]
+        dct_colors["LATE"] = [0.9, 0, 0]
+        dct_colors["DONE"] = [0, .8, 0]
+        dct_colors["INPROGRESS"] = [.9, .9, 0]
+
+        color = dct_colors[status]
+
+        ctx.set_source_rgb(color[0], color[1], color[2])
         ctx.rectangle(xstart,ystart,w,h)
         ctx.fill()
         ctx.select_font_face("Sans", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)

@@ -100,7 +100,7 @@ def getDeliverableText(D_id):
     s = "\\subsection*{Deliverable D" +str(df['Deliverable'].values[0]) +": "+ str(df['Name'].values[0]) + "}\n\n"
 
     quarter_start = df_deliverable[df_deliverable['Deliverable']==D_id]['Quarter'].iloc[0]
-    dur = df_deliverable[df_deliverable['Deliverable']==1.12]['Quarter'].iloc[0]
+    dur = df_deliverable[df_deliverable['Deliverable']==D_id]['Quarter'].iloc[0]
     quarter_end = quarter_start+dur
     owner = df_deliverable[df_deliverable['Deliverable']==D_id]['Owner'].iloc[0]
     status = df_deliverable[df_deliverable['Deliverable']==D_id]['Status'].iloc[0]
@@ -108,6 +108,7 @@ def getDeliverableText(D_id):
 
     date_quarter_start = date_project_start+ relativedelta(months=+((quarter_start-1)*3))
     date_quarter_end = date_project_start+ relativedelta(months=+((quarter_start-1)*3)) + relativedelta(months=+(dur*3))
+
 
     s+=  "Start quarter: Q%i (%s) \n \n End Quarter: Q%i (%s) \n\n Leader: %s\n\n  Status: %s \n\n "%(quarter_start, date_quarter_start.strftime("%Y-%m-%d"), quarter_end, date_quarter_start.strftime("%Y-%m-%d"),  owner, status)
 
@@ -295,7 +296,8 @@ def makeGanttChart(fn_gantt_png, date_project_start):
         t_start = df_deliverable.iloc[i]['Quarter']
         t_end   = df_deliverable.iloc[i]['Quarter'] + df_deliverable.iloc[1]['Duration']
         name    = "D"+str(df_deliverable.iloc[i]['Deliverable'])+": "+str(df_deliverable.iloc[i]['Name'])
-        g.drawTask( i, t_start, t_end, name)
+        status = df_deliverable.iloc[i]['Status']
+        g.drawTask( i, t_start, t_end, name, status)
 
     g.draw(fn_gantt_png)
 
