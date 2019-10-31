@@ -312,10 +312,10 @@ def getProjectID(dir_in):
 if __name__ == "__main__":
     if len(sys.argv) < 3:
         #testing
-        dir_in = "/home/charles/Dropbox/ARWAC/admin/pandagantt/in/"
-        dir_out = "/home/charles/Dropbox/ARWAC/admin/pandagantt/out/"
-#        print("USAGE: pandagantt inputdir outputdir")
-#        sys.exit(0)
+#        dir_in = "/home/charles/Dropbox/ARWAC/admin/pandagantt/in/"
+#        dir_out = "/home/charles/Dropbox/ARWAC/admin/pandagantt/out/"
+        print("USAGE: pandagantt inputdir outputdir")
+        sys.exit(0)
     else:
         dir_in = sys.argv[1]+"/"
         dir_out = sys.argv[2]+"/"
