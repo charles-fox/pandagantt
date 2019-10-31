@@ -1,7 +1,7 @@
 #PANDAGANTT python3 PRINCE2 plan generator
 #(c) Charles Fox, University of Lincoln, 2019
 #Distributed under GNU General Public License (GPL) v3 see https://www.gnu.org/licenses/gpl-3.0.en.html
-#("pandgantt" is pronounced in a New Zealand accent similar to "pendagent")
+#("pandgantt" should be pronounced in a New Zealand accent similar to "pendegent")
 #eg. usgae:  python3 pandagantt.py ~/Dropbox/ARWAC/admin/pandagantt/in/   ~/Dropbox/ARWAC/admin/pandagantt/out/
 
 import pandas as pd
@@ -100,17 +100,17 @@ def getDeliverableText(D_id):
     s = "\\subsection*{Deliverable D" +str(df['Deliverable'].values[0]) +": "+ str(df['Name'].values[0]) + "}\n\n"
 
     quarter_start = df_deliverable[df_deliverable['Deliverable']==D_id]['Quarter'].iloc[0]
-    dur = df_deliverable[df_deliverable['Deliverable']==D_id]['Quarter'].iloc[0]
+    dur = df_deliverable[df_deliverable['Deliverable']==D_id]['Duration'].iloc[0]
     quarter_end = quarter_start+dur
     owner = df_deliverable[df_deliverable['Deliverable']==D_id]['Owner'].iloc[0]
     status = df_deliverable[df_deliverable['Deliverable']==D_id]['Status'].iloc[0]
 
 
     date_quarter_start = date_project_start+ relativedelta(months=+((quarter_start-1)*3))
-    date_quarter_end = date_project_start+ relativedelta(months=+((quarter_start-1)*3)) + relativedelta(months=+(dur*3))
+    date_quarter_end = date_project_start+ relativedelta(months=+((quarter_end-1)*3)) 
 
 
-    s+=  "Start quarter: Q%i (%s) \n \n End Quarter: Q%i (%s) \n\n Leader: %s\n\n  Status: %s \n\n "%(quarter_start, date_quarter_start.strftime("%Y-%m-%d"), quarter_end, date_quarter_start.strftime("%Y-%m-%d"),  owner, status)
+    s+=  "Start quarter: Q%i (%s) \n \n End Quarter: Q%i (%s) \n\n Leader: %s\n\n  Status: %s \n\n "%(quarter_start, date_quarter_start.strftime("%Y-%m-%d"), quarter_end, date_quarter_end.strftime("%Y-%m-%d"),  owner, status)
 
     #print each row of description text
     s += "\subsubsection*{Description of work}\n\n"
@@ -195,11 +195,11 @@ def getDeliverableText(D_id):
     s+="\\newpage"
     return s
 
-def getPartnerSpendTable():
+def getPartnerSpendTable(gb, partners):
     s="\\newpage\n\n"
     s="\section{Spend profiles}\n\n"
 
-    partners = ["LINCOLN", "ARWAC"]
+#    partners = ["LINCOLN", "ARWAC"]
     categories = ["MATERIALS", "LABOUR", "CAPEX", "TRAVEL", "OTHER", "OVERHEADS", "SUBCON"]
     quarters = [1,2,3,4,5,6,7,8]
 
@@ -268,7 +268,7 @@ def runLatex(projectID, dir_out):
     subprocess.call(cmd, shell="True")
 
 
-def makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors):
+def makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors, gb, partners):
     fn_tex = dir_out+"%s_stage2plan.tex"%projectID
     f_out = open(fn_tex, 'w')
     s = latexHeader(projectID, authors, dir_in)
@@ -279,7 +279,7 @@ def makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors):
         D_id = row['Deliverable']
         s += getDeliverableText(D_id)
 
-    s+= getPartnerSpendTable()
+    s+= getPartnerSpendTable(gb, partners)
 
     s+= getRiskMatrix()
 
@@ -329,6 +329,7 @@ if __name__ == "__main__":
     df_Dependency = pd.read_csv(dir_csv+'Dependency.csv', skiprows=0, header=0) 
     df_Project = pd.read_csv(dir_csv+'Project.csv', skiprows=0, header=0) 
     df_WorkPackage = pd.read_csv(dir_csv+'WorkPackage.csv', skiprows=0, header=0) 
+    df_Partner = pd.read_csv(dir_csv+'Partner.csv', skiprows=0, header=0) 
 
     gb = df_cost.merge(df_deliverable)[['Partner', 'Quarter', 'Category', 'Cost']].groupby(['Partner','Quarter', 'Category'])
 
@@ -336,8 +337,13 @@ if __name__ == "__main__":
 
     date_project_start = datetime.datetime.strptime(df_Project.iloc[0]['StartDate'], "%Y-%m-%d" )
     authors = df_Project.iloc[0]['ReportAuthor']
+    
+
+    partners=[]
+    for i in range(0, len(df_Partner)):
+        partners.append(df_Partner.iloc[i]["ID"])
 
 
     makeGanttChart(dir_out+"gantt.png", date_project_start)
 
-    makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors)
+    makeStageTwoPlan(projectID, dir_in, dir_out, df_deliverable, authors, gb, partners)

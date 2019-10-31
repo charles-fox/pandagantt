@@ -48,7 +48,7 @@ class GanttChart:
         dct_colors["WAITING"] = [.5, .5, 1]
         dct_colors["LATE"] = [0.9, 0, 0]
         dct_colors["DONE"] = [0, .8, 0]
-        dct_colors["INPROGRESS"] = [.9, .9, 0]
+        dct_colors["INPROGRESS"] = [1, .8, 0]
 
         color = dct_colors[status]
 
