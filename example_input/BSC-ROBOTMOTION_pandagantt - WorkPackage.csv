@@ -1,0 +1,8 @@
+id,Name,Objectives,Description
+1,Simulation,Create 3D simulation of robot.,Shall be developed in Gazebo robotics simulator. Shall include experiments measuring properties of the physical vehicle to ensure accurate simulation. Attention shall be paid to wheel friction in particular.
+2,Motion control,Port Lincoln's movebase stack to the simulated robot.,"The simulation shall be used to port Lincoln’s standard motion
+control stack (based on movebase with timed elastic bands) for use
+on the new robot. Once ported, the stack will be tested in simulation
+and optionally on the real robot
+
+"

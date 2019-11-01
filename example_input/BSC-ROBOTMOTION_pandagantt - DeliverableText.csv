@@ -1,0 +1,8 @@
+Deliverable,TextLine
+1.1,Demonstrate to supervisor an understanding of the complete ROS and Gazebo tutorials by running and talking through code for their final tutorials containing all taught concepts.
+1.2,"Demonstrate to supervisor understanding of the existing Lincoln podcar simulation as currently on github, by running and talking through modifed version which makes the physics more realistic through modified guessed new parameters."
+1.3,Demonstrate to supervisor the accuracy of new parameters needed for the sim collected experimentally from the real robot. Likely to requrise design of suitable experiments to measure as well as some theory to understand what is needed. 
+1.4,"Design and demonstrate experiments proving that the updated simulation is accurace, eg. comparing outcomes of givign the same motion commands to the real and simulated robot. Comparisons are especially important if we want to publish this work, as they are empirical results."
+2.1,"Demonstrate to supervisor running code showing understanding of standard movebase setup, eg by starting with the Clearpath Huskey simulation setup available online and modifyign some parameters based on guesswork to make it more like our robot."
+2.2,Demonstrate ported of movebase running on the new simulated robot.
+2.3,Demo of movebase on new physicical robot (optional)

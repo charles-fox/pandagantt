@@ -2,7 +2,8 @@
 #(c) Charles Fox, University of Lincoln, 2019
 #Distributed under GNU General Public License (GPL) v3 see https://www.gnu.org/licenses/gpl-3.0.en.html
 #("pandgantt" should be pronounced in a New Zealand accent similar to "pendegent")
-#eg. usgae:  python3 pandagantt.py ~/Dropbox/ARWAC/admin/pandagantt/in/   ~/Dropbox/ARWAC/admin/pandagantt/out/
+#eg. example usage:  (NB need to use full paths in input and output dirs)
+#  python3 pandagantt.py /home/charles/git/pandagantt/example_input/ /home/charles/git/pandagantt/example_output/
 
 import pandas as pd
 import numpy as np
