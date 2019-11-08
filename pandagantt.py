@@ -332,6 +332,8 @@ if __name__ == "__main__":
     df_WorkPackage = pd.read_csv(dir_csv+'WorkPackage.csv', skiprows=0, header=0) 
     df_Partner = pd.read_csv(dir_csv+'Partner.csv', skiprows=0, header=0) 
 
+    subprocess.call("mkdir -p "+dir_out, shell=True)
+
     gb = df_cost.merge(df_deliverable)[['Partner', 'Quarter', 'Category', 'Cost']].groupby(['Partner','Quarter', 'Category'])
 
     rd = df_RiskDeliverable.merge(df_risk)
