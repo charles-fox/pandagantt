@@ -1,9 +1,0 @@
-
-show current date
-
-still hacking deliverable lengths by storing deliverables as multiple rows in the spreadsheet. should have one row per deliverable with a duration.
-
-cost assign labour to all running deliverables to flatten it. eg. assign labour tems to "deliberable 0" then add code to massage this across the actual deliverables.
-
-
-compute manhours per deliverable and report -- count the costs which are labour, they have a dayrate as itemcost and number of days as quantity. use quantity to get hours.

@@ -1,8 +1,0 @@
-Deliverable,Name,Quarter,Duration,Owner,Status
-1.1,Completed ROS and Gazebo tutorials,1,1,CHURCHILL,DONE
-1.2,Understanding existing github sim,1,1,CHURCHILL,INPROGRESS
-1.3,Experimental measurements,2,1,CHURCHILL,WAITING
-1.4,Updated simulation,2,1,CHURCHILL,WAITING
-2.1,Understanding standard movebase ,3,1,CHURCHILL,WAITING
-2.2,Ported movebase for new robot,3,1,CHURCHILL,WAITING
-2.3,Demo of movebase on new robot,3,1,CHURCHILL,WAITING
